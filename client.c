@@ -95,7 +95,6 @@ int	main(int args, char **argv)
 		ft_putstr("Error\npID bad number\n");
 		return (1);
 	}
-	ft_putstr("Отправка в ");
 	ft_putstr(argv[1]);
 	delivery(pID, argv[2]);
 	ft_putstr("\nSending is completed\n");
