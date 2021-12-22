@@ -1,0 +1,9 @@
+{
+    "42header.username": "ychair",
+    "42header.email": "ychair@student.42.fr",
+    "files.associations": {
+        "signal.h": "c",
+        "minitalk.h": "c",
+        "ft_printf.h": "c"
+    }
+}
