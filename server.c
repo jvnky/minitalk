@@ -12,54 +12,76 @@
 
 #include "minitalk.h"
 
-void	ft_putnbr_fd(int n, int fd)
-{
-	char	c;
+t_data	g_data;
 
-	if (n < 0)
-	{
-		write(fd, "-", 1);
-		if (n == -2147483648)
-		{
-			write(fd, "2147483648", 10);
-			return ;
-		}
-		n *= -1;
-	}
-	if (n > 9)
-		ft_putnbr_fd(n / 10, fd);
-	c = (n % 10) + '0';
-	write(fd, &c, 1);
+void	ft_putchar(char c)
+{
+	write(1, &c, 1);
 }
 
-void	transform(int s)
+void	ft_putstr(char *str)
 {
-	static int	c = 0;
-	static int	count = 1;
+	int	i;
 
-	if (s == SIGUSR1)
-		c += count;
-	count *= 2;
-	if (count == 256)
+	i = 0;
+	while (str[i])
 	{
-		count = 1;
-		write(1, &c, 1);
-		c = 0;
+		ft_putchar(str[i]);
+		i++;
+	}
+}
+
+void	ft_putnbr(int n)
+{
+	if (n == 0)
+		return ;
+	ft_putnbr(n / 10);
+	ft_putchar(((n % 10) + 48));
+}
+
+void	processing(int signal)
+{
+	int	symbol;
+	int	pos;
+
+	g_data.bit[g_data.count] = signal;
+	g_data.count++;
+	if (g_data.count >= 8)
+	{
+		symbol = 0;
+		pos = 0;
+		while (pos < 8)
+		{
+			if (g_data.bit[7 - pos] == SIGUSR1)
+				symbol += g_data.pow_2[pos];
+			pos++;
+		}
+		ft_putchar(symbol);
+		g_data.count = 0;
 	}
 }
 
 int	main(void)
 {
-	int	pid;
+	int	i;
+	int	num;
 
-	pid = getpid();
-	write(1, "PID: ", 5);
-	ft_putnbr_fd(pid, 1);
-	write(1, "\n", 1);
-	while (1)
+	g_data.count = 0;
+	i = 0;
+	num = 1;
+	while (i < 8)
 	{
-		signal(SIGUSR1, transform);
-		signal(SIGUSR2, transform);
+		g_data.pow_2[i] = num;
+		num = num * 2;
+		i++;
+	}
+	ft_putstr("Server pID: ");
+	ft_putnbr(getpid());
+	ft_putstr("\nWaiting for a message...\n");
+	while (42)
+	{
+		signal(SIGUSR1, processing);
+		signal(SIGUSR2, processing);
 		pause();
 	}
 	return (0);

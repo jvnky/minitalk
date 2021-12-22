@@ -12,95 +12,92 @@
 
 #include "minitalk.h"
 
-int	ft_strlen(const char *c)
+void	ft_putchar(char c)
 {
-	int	count;
-
-	count = 0;
-	while (*c != '\0')
-	{
-		count++;
-		c++;
-	}
-	return (count);
+	write(1, &c, 1);
 }
 
-int	ft_atoi(const char *str)
+void	ft_putstr(char *str)
 {
-	int	result;
-	int	sign;
-
-	result = 0;
-	sign = 1;
-	while ((*str == 32) || (*str >= 9 && *str <= 13))
-		str++;
-	if ((*str >= 65 && *str <= 90) || (*str >= 97 && *str <= 122))
-		return (0);
-	if ((*str) == '-' || (*str) == '+')
-	{
-		if (*str == '+')
-			sign = 1;
-		else
-			sign = -1;
-		++str;
-	}
-	while ((*str >= 48) && (*str <= 57))
-	{
-		result = (result * 10) + (*str - 48);
-		str++;
-	}
-	return (sign * result);
-}
-
-void	send_newline(int pid)
-{
-	char	a;
-	int		n;
-
-	a = '\n';
-	n = 1;
-	while (n <= 128)
-	{
-		if (a & n)
-			kill(pid, SIGUSR1);
-		else
-			kill(pid, SIGUSR2);
-		n *= 2;
-		usleep(100);
-	}
-}
-
-void	send_chars(int pid, char **argv)
-{
-	int	len;
-	int	n;
 	int	i;
 
-	len = ft_strlen(argv[2]);
 	i = 0;
-	while (i < len)
+	while (str[i])
 	{
-		n = 1;
-		while (n <= 128)
+		ft_putchar(str[i]);
+		i++;
+	}
+}
+
+pid_t	pid_parser(char *str)
+{
+	int			i;
+	long long	num;
+
+	i = 0;
+	num = 0;
+	while (str[i])
+	{
+		if (str[i] >= '0' && str[i] <= '9')
 		{
-			if (argv[2][i] & n)
-				kill(pid, SIGUSR1);
+			num = num * 10 + str[i] - 48;
+			if (num > 500000000)
+				return (0);
+		}
+		else
+			return (0);
+		i++;
+	}
+	return (num);
+}
+
+void	delivery(pid_t pID, char *message)
+{
+	int	i;
+	int	pos;
+	int	bit[8];
+
+	i = 0;
+	while (message[i])
+	{
+		pos = 0;
+		while (pos < 8)
+		{
+			bit[7 - pos] = message[i] % 2;
+			message[i] /= 2;
+			pos++;
+		}
+		pos = 0;
+		while (pos < 8)
+		{
+			if (bit[pos++] == 1)
+				kill(pID, SIGUSR1);
 			else
-				kill(pid, SIGUSR2);
-			n *= 2;
-			usleep(100);
+				kill(pID, SIGUSR2);
+			usleep(60);
 		}
 		i++;
 	}
 }
 
-int	main(int argc, char **argv)
+int	main(int args, char **argv)
 {
-	int		pid;
+	pid_t	pID;
 
-	if (argc != 3)
-		return (0);
-	pid = ft_atoi(argv[1]);
-	send_chars(pid, argv);
-	send_newline(pid);
+	if (args != 3)
+	{
+		ft_putstr("Error\nInvalid number of arguments\n");
+		return (1);
+	}
+	pID = pid_parser(argv[1]);
+	if (pID == 0)
+	{
+		ft_putstr("Error\npID bad number\n");
+		return (1);
+	}
+	ft_putstr("Отправка в ");
+	ft_putstr(argv[1]);
+	delivery(pID, argv[2]);
+	ft_putstr("\nSending is completed\n");
+	return (0);
 }

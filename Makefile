@@ -12,21 +12,35 @@
 
 NAME_SERVER = server
 NAME_CLIENT = client
-CC = gcc
-CFLAGS = -Werror -Wextra -Wall
-SRC_SERVER = server.c
-SRC_CLIENT = client.c
-RM = rm -f
+.PHONY	:	all clean fclean re
 
-all: $(NAME_SERVER) $(NAME_CLIENT)
+NAME_SERVER	=	server
+NAME_CLIENT	=	client
 
-$(NAME): all
-	$(CC) -g $(CFLAGS) $(SRC_SERVER) -o $(NAME_SERVER)
-	$(CC) -g $(CFLAGS) $(SRC_CLIENT) -o $(NAME_CLIENT)
-	
-clean:
-		$(RM) $(NAME_CLIENT) $(NAME_SERVER)
-		
-fclean: clean
+HEADER		=   minitalk.h
 
-re: fclean all
+SRC_SERVER	=	server.c
+SRC_CLIENT	=   client.c
+
+FLAGS		=	-Wall -Wextra -Werror
+
+OBJ_SERVER	=	$(patsubst %.c, %.o, $(SRC_SERVER))
+OBJ_CLIENT	=	$(patsubst %.c, %.o, $(SRC_CLIENT))
+
+all		: $(NAME_SERVER) $(NAME_CLIENT)
+
+$(NAME_SERVER):	$(SRC_SERVER) $(HEADER)
+	gcc $(FLAGS) -c $(SRC_SERVER)
+	gcc $(FLAGS) $(OBJ_SERVER) -o $(NAME_SERVER)
+
+$(NAME_CLIENT):	$(SRC_CLIENT) $(HEADER)
+	gcc $(FLAGS) -c $(SRC_CLIENT)
+	gcc $(FLAGS) $(OBJ_CLIENT) -o $(NAME_CLIENT)
+
+clean	:
+	rm -f $(OBJ_SERVER) $(OBJ_CLIENT)
+
+fclean	:	clean
+	rm -f $(NAME_SERVER) $(NAME_CLIENT)
+
+re		:	fclean all
