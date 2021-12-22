@@ -23,5 +23,9 @@ void	bin_to_dec(char *bin_str);
 void	convert_n_send_msg(char *input, int pid);
 void	dec_to_bin(int val, int pid);
 void	send_msg(char *str, int pid);
+void	ft_bzero(void *s, size_t len);
+void	*ft_calloc(size_t count, size_t size);
+int	    ft_atoi(const char *str);
+int	    ft_isdigit(int c);
 
 #	endif

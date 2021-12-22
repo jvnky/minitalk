@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "minitalk.h"
+#include "ft_printf/src/ft_printf.h"
 
 void	bin_to_dec(char *bin_str)
 {
