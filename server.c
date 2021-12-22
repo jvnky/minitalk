@@ -11,42 +11,40 @@
 /* ************************************************************************** */
 
 #include "minitalk.h"
-#include "ft_printf/src/ft_printf.h"
 
-void	bin_to_dec(char *bin_str)
+void	ft_putnbr_fd(int n, int fd)
 {
-	int		dec_val;
 	char	c;
-	int		bin_val;
 
-	bin_val = 128;
-	dec_val = 0;
-	while (*bin_str)
+	if (n < 0)
 	{
-		if (*bin_str == '1')
-			dec_val += bin_val;
-		bin_val /= 2;
-		bin_str++;
+		write(fd, "-", 1);
+		if (n == -2147483648)
+		{
+			write(fd, "2147483648", 10);
+			return ;
+		}
+		n *= -1;
 	}
-	c = dec_val;
-	write(1, &c, 1);
-	return ;
+	if (n > 9)
+		ft_putnbr_fd(n / 10, fd);
+	c = (n % 10) + '0';
+	write(fd, &c, 1);
 }
 
-void	create_bin_str(int sig)
+void	transform(int s)
 {
-	static char	bin_str[9];
-	static int	i;
+	static int	c = 0;
+	static int	count = 1;
 
-	if (sig == SIGUSR1)
-		bin_str[i++] = '0';
-	else if (sig == SIGUSR2)
-		bin_str[i++] = '1';
-	if (i == 8)
+	if (s == SIGUSR1)
+		c += count;
+	count *= 2;
+	if (count == 256)
 	{
-		bin_to_dec(bin_str);
-		i = 0;
-		*bin_str = 0;
+		count = 1;
+		write(1, &c, 1);
+		c = 0;
 	}
 }
 
@@ -55,10 +53,14 @@ int	main(void)
 	int	pid;
 
 	pid = getpid();
-	ft_printf("PID: %d\n", pid);
-	signal(SIGUSR1, &create_bin_str);
-	signal(SIGUSR2, &create_bin_str);
+	write(1, "PID: ", 5);
+	ft_putnbr_fd(pid, 1);
+	write(1, "\n", 1);
 	while (1)
+	{
+		signal(SIGUSR1, transform);
+		signal(SIGUSR2, transform);
 		pause();
+	}
 	return (0);
 }

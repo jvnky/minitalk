@@ -5,81 +5,102 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ychair <ychair@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/12/20 12:43:47 by ychair            #+#    #+#             */
-/*   Updated: 2021/12/20 12:43:47 by ychair           ###   ########.fr       */
+/*   Created: 2021/12/22 05:42:27 by ychair            #+#    #+#             */
+/*   Updated: 2021/12/22 05:42:27 by ychair           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minitalk.h"
 
-# include "minitalk.h"
-
-void	send_msg(char *msg, int pid)
+int	ft_strlen(const char *c)
 {
-	while (*msg)
+	int	count;
+
+	count = 0;
+	while (*c != '\0')
 	{
-		if (*msg == '0')
+		count++;
+		c++;
+	}
+	return (count);
+}
+
+int	ft_atoi(const char *str)
+{
+	int	result;
+	int	sign;
+
+	result = 0;
+	sign = 1;
+	while ((*str == 32) || (*str >= 9 && *str <= 13))
+		str++;
+	if ((*str >= 65 && *str <= 90) || (*str >= 97 && *str <= 122))
+		return (0);
+	if ((*str) == '-' || (*str) == '+')
+	{
+		if (*str == '+')
+			sign = 1;
+		else
+			sign = -1;
+		++str;
+	}
+	while ((*str >= 48) && (*str <= 57))
+	{
+		result = (result * 10) + (*str - 48);
+		str++;
+	}
+	return (sign * result);
+}
+
+void	send_newline(int pid)
+{
+	char	a;
+	int		n;
+
+	a = '\n';
+	n = 1;
+	while (n <= 128)
+	{
+		if (a & n)
 			kill(pid, SIGUSR1);
-		else if (*msg == '1')
+		else
 			kill(pid, SIGUSR2);
-		msg++;
+		n *= 2;
 		usleep(100);
 	}
 }
 
-void	dec_to_bin(int val, int pid)
+void	send_chars(int pid, char **argv)
 {
-	char	*bin_str;
-	int		i;
+	int	len;
+	int	n;
+	int	i;
 
+	len = ft_strlen(argv[2]);
 	i = 0;
-	bin_str = ft_calloc(8 + 1, sizeof(char));
-	while (i < 8)
+	while (i < len)
 	{
-		if ((128 & (val << i)))
-			bin_str[i] = '1';
-		else
-			bin_str[i] = '0';
+		n = 1;
+		while (n <= 128)
+		{
+			if (argv[2][i] & n)
+				kill(pid, SIGUSR1);
+			else
+				kill(pid, SIGUSR2);
+			n *= 2;
+			usleep(100);
+		}
 		i++;
 	}
-	send_msg(bin_str, pid);
-	free(bin_str);
-}
-
-void	convert_n_send_msg(char *input, int pid)
-{
-	while (*input)
-	{
-		dec_to_bin(*input, pid);
-		input++;
-	}
-}
-
-static int	is_only_digits(char *str)
-{
-	while (*str)
-	{
-		if (!ft_isdigit(*str))
-		{
-			ft_printf("The PID should only contain digits.\n");
-			return (0);
-		}
-		str++;
-	}
-	return (1);
 }
 
 int	main(int argc, char **argv)
 {
-	int	pid;
+	int		pid;
 
-	if (argc == 3)
-	{
-		if (!is_only_digits(argv[1]))
-			return (0);
-		pid = ft_atoi(argv[1]);
-		convert_n_send_msg(argv[2], pid);
-	}
-	else
-		ft_printf("Only three arguments please.\n");
-	return (0);
+	if (argc != 3)
+		return (0);
+	pid = ft_atoi(argv[1]);
+	send_chars(pid, argv);
+	send_newline(pid);
 }
