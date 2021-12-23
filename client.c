@@ -6,7 +6,7 @@
 /*   By: ychair <ychair@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/22 05:42:27 by ychair            #+#    #+#             */
-/*   Updated: 2021/12/23 18:28:43 by ychair           ###   ########.fr       */
+/*   Updated: 2021/12/23 19:37:46 by ychair           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,18 +46,18 @@ pid_t	pid_parser(char *str)
 	return (num);
 }
 
-void	tricksleep(pid_t pid,int sig)
+void	tricksleep(pid_t pid, int sig)
 {
 	if (sig == 1)
 	{
 		kill(pid, SIGUSR1);
 		usleep(90);
 	}
-	else 
-		{
-			kill(pid, SIGUSR2);
-			usleep(90);
-		}
+	else
+	{
+		kill(pid, SIGUSR2);
+		usleep(90);
+	}
 }
 
 void	delivery(pid_t pid, char *message)
@@ -79,9 +79,9 @@ void	delivery(pid_t pid, char *message)
 		while (pos < 8)
 		{
 			if (bit[pos++] == 1)
-				tricksleep(pid,1);
+				tricksleep(pid, 1);
 			else
-				tricksleep(pid,2);
+				tricksleep(pid, 2);
 			usleep(140);
 		}
 	}
