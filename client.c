@@ -6,7 +6,7 @@
 /*   By: ychair <ychair@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/22 05:42:27 by ychair            #+#    #+#             */
-/*   Updated: 2021/12/22 05:42:27 by ychair           ###   ########.fr       */
+/*   Updated: 2021/12/23 16:07:02 by ychair           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ void	delivery(pid_t pID, char *message)
 				kill(pID, SIGUSR1);
 			else
 				kill(pID, SIGUSR2);
-			usleep(60);
+			usleep(150);
 		}
 		i++;
 	}
@@ -82,21 +82,21 @@ void	delivery(pid_t pID, char *message)
 
 int	main(int args, char **argv)
 {
-	pid_t	pID;
+	pid_t	pid;
 
 	if (args != 3)
 	{
 		ft_putstr("Error\nInvalid number of arguments\n");
 		return (1);
 	}
-	pID = pid_parser(argv[1]);
-	if (pID == 0)
+	pid = pid_parser(argv[1]);
+	if (pid == 0)
 	{
 		ft_putstr("Error\npID bad number\n");
 		return (1);
 	}
 	ft_putstr(argv[1]);
-	delivery(pID, argv[2]);
+	delivery(pid, argv[2]);
 	ft_putstr("\nSending is completed\n");
 	return (0);
 }
