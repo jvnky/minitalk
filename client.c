@@ -6,16 +6,11 @@
 /*   By: ychair <ychair@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/22 05:42:27 by ychair            #+#    #+#             */
-/*   Updated: 2021/12/23 16:07:02 by ychair           ###   ########.fr       */
+/*   Updated: 2021/12/23 17:44:10 by ychair           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
-
-void	ft_putchar(char c)
-{
-	write(1, &c, 1);
-}
 
 void	ft_putstr(char *str)
 {
@@ -51,52 +46,61 @@ pid_t	pid_parser(char *str)
 	return (num);
 }
 
-void	delivery(pid_t pID, char *message)
+void	tricksleep(pid_t pid)
+{
+	kill(pid, SIGUSR1);
+	usleep(90);
+}
+
+void	delivery(pid_t pid, char *message)
 {
 	int	i;
 	int	pos;
 	int	bit[8];
 
-	i = 0;
-	while (message[i])
+	i = -1;
+	while (message[++i])
 	{
-		pos = 0;
-		while (pos < 8)
+		pos = -1;
+		while (++pos < 8)
 		{
 			bit[7 - pos] = message[i] % 2;
 			message[i] /= 2;
-			pos++;
 		}
 		pos = 0;
 		while (pos < 8)
 		{
 			if (bit[pos++] == 1)
-				kill(pID, SIGUSR1);
+				tricksleep(pid);
 			else
-				kill(pID, SIGUSR2);
-			usleep(150);
+				kill(pid, SIGUSR2);
+			usleep(90);
 		}
-		i++;
 	}
 }
 
-int	main(int args, char **argv)
+int	main(void)
 {
-	pid_t	pid;
+	int	i;
+	int	num;
 
-	if (args != 3)
+	g_data.count = 0;
+	i = 0;
+	num = 1;
+	while (i < 8)
 	{
-		ft_putstr("Error\nInvalid number of arguments\n");
-		return (1);
+		g_data.pow_2[i] = num;
+		num = num * 2;
+		i++;
 	}
-	pid = pid_parser(argv[1]);
-	if (pid == 0)
+	ft_putstr("Server pID: ");
+	ft_putnbr(getpid());
+	ft_putstr("\nWaiting for a message...\n");
+	while (42)
 	{
-		ft_putstr("Error\npID bad number\n");
-		return (1);
+		signal(SIGUSR1, processing);
+		signal(SIGUSR2, processing);
+		pause();
 	}
-	ft_putstr(argv[1]);
-	delivery(pid, argv[2]);
-	ft_putstr("\nSending is completed\n");
 	return (0);
 }
