@@ -6,7 +6,7 @@
 /*   By: ychair <ychair@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/22 05:42:27 by ychair            #+#    #+#             */
-/*   Updated: 2021/12/23 17:44:10 by ychair           ###   ########.fr       */
+/*   Updated: 2021/12/23 18:07:50 by ychair           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	ft_putstr(char *str)
 	i = 0;
 	while (str[i])
 	{
-		ft_putchar(str[i]);
+		write(1, &str[i], 1);
 		i++;
 	}
 }
@@ -79,28 +79,23 @@ void	delivery(pid_t pid, char *message)
 	}
 }
 
-int	main(void)
+int	main(int args, char **argv)
 {
-	int	i;
-	int	num;
+	pid_t	pid;
 
-	g_data.count = 0;
-	i = 0;
-	num = 1;
-	while (i < 8)
+	if (args != 3)
 	{
-		g_data.pow_2[i] = num;
-		num = num * 2;
-		i++;
+		ft_putstr("Error\nInvalid number of arguments\n");
+		return (1);
 	}
-	ft_putstr("Server pID: ");
-	ft_putnbr(getpid());
-	ft_putstr("\nWaiting for a message...\n");
-	while (42)
+	pid = pid_parser(argv[1]);
+	if (pid == 0)
 	{
-		signal(SIGUSR1, processing);
-		signal(SIGUSR2, processing);
-		pause();
+		ft_putstr("Error\npID bad number\n");
+		return (1);
 	}
+	ft_putstr(argv[1]);
+	delivery(pid, argv[2]);
+	ft_putstr("\nSending is completed\n");
 	return (0);
 }

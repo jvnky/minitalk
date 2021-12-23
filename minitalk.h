@@ -6,7 +6,7 @@
 /*   By: ychair <ychair@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/12/20 12:43:39 by ychair            #+#    #+#             */
-/*   Updated: 2021/12/23 17:46:19 by ychair           ###   ########.fr       */
+/*   Updated: 2021/12/23 17:51:48 by ychair           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,4 +26,5 @@ typedef struct s_data
 
 void	ft_putchar(char c);
 void	ft_putstr(char *str);
+void	ft_putnbr(int n);
 #endif
